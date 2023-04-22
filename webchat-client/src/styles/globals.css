@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+html {
+  min-height: -webkit-fill-available;
+}
+
+body {
+  background: url('/img/cream_dust.png') repeat 0 0;
+}
+
+h1 {
+  align-self: center;
+  font-size: 2rem;
+  background: linear-gradient(to bottom right, rgb(95, 137, 196),rgb(129, 158, 117));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+textarea {
+  resize: none;
+}
+
+.avatar {
+  align-self: center;
+  margin-left: auto;
+  margin-right: 1rem;
+}
+
+.topnav {
+  background: linear-gradient(to bottom right, rgb(10, 30, 20),rgb(40, 20, 80));
+}
+
+.side-bar {
+  height: -webkit-fill-available;
+}
+
+.go-expand {    
+  animation-name: expand;
+  animation-duration: 1s;
+}
+
+@keyframes expand {
+  from {height:0%;} to {height:100%;}
+}
+
+.conversation {
+  width: 100%;
+  font-size: 1.5rem;
+  padding: 1rem;
+  border-bottom: 0.1rem inset gainsboro;
+}
+
+.conversation:hover {
+  background-color: gainsboro;
+}
+
+.login-button {
+  padding: 1rem;
+}
+
+.messages::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.messages {
+  height: 60vh;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
