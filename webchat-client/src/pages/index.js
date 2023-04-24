@@ -12,6 +12,7 @@ export default function Home() {
   const [Messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [newBatchCount, setNewBatchCount] = useState(0);
+  const [roomList, setRoomList] = useState([]);
   const messagesEndRef = useRef(null);
   const topMessageRef = useRef(null);
   const allowMove = useRef(false);
@@ -23,6 +24,12 @@ export default function Home() {
 
   useEffect(() => {
     if (!connected.current && status === "authenticated") {
+      fetch(`/api/get-rooms`)
+        .then((res) => res.json())
+        .then((fetchdata) => {
+          setRoomList(fetchdata);
+        })
+
       socket = io("https://chat.tobywong.ga:2053", {
         secure: true,
         withCredentials: true,
@@ -177,16 +184,24 @@ export default function Home() {
           <div className={"topnav flex flex-row gap-4 p-2"}>
             <button className='text-slate-50 p-4 text-3xl' onClick={() => barClose()}><b>&times; Close</b></button>
             <h1><b>WebChat</b></h1>
-            <img className='avatar w-10 h-10 rounded-full' src={session.user.image} />
+            <img className='avatar h-12 w-12 flex-none rounded-full bg-gray-50' src={session.user.image} />
           </div>
           <div className='overflow-scroll h-full'>
             <button className='login-button conversation bg-red-50' onClick={() => signOut()}>Sign Out</button>
-            <div className='conversation clickable' onClick={() => {enterRoom(2);barClose()}}>
-              ID: {2}
+            <div className='conversation clickable' onClick={() => { enterRoom(1); barClose() }}>
+              Global Chat
             </div>
-            <div className='conversation clickable' onClick={() => {enterRoom(3);barClose()}}>
-              ID: {3}
-            </div>
+            {
+              roomList && (
+                roomList.map((roomData, index) => {
+                  return (
+                    <div className='conversation clickable' key={"room" + index} onClick={() => { enterRoom(roomData.roomid); barClose() }}>
+                      {roomData.name}
+                    </div>
+                  )
+                })
+              )}
+
           </div>
         </div>
 
@@ -217,8 +232,7 @@ export default function Home() {
                       </div>
                     </li>
                   )
-                }
-                )}
+                })}
               </ul>
             )}
             <div ref={messagesEndRef} />

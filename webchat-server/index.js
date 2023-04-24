@@ -59,7 +59,6 @@ function checkAccess(id, roomid) {
                 reject(err)
             } else {
                 if (JSON.parse(JSON.stringify(rows[0]))['COUNT(1)'] + '' === '1') {
-                    console.log("checkAccess: true")
                     resolve(true);
                 }
                 resolve(false);
@@ -87,7 +86,7 @@ io.on('connection', (socket) => {
             let SecondsZ = today.getSeconds() >= 10 ? '' : '0';
             var time = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate() + " " + HoursZ + today.getHours() + ":" + MinutesZ + today.getMinutes() + ":" + SecondsZ + today.getSeconds();
             setTimeout(() => {
-                io.in(puser.room).emit('message', "Server", "https://i.ibb.co/C90rDj5/chick-min.png", `Welcome ${puser.username} to the room!`, time);
+                io.in(puser.room).emit('message', "Server", "https://i.ibb.co/C90rDj5/chick-min.png", `Welcome ${puser.username} to the chat!`, time);
             }, "1000");
         } else {
             console.log("User", id, "has no access to the room id", room);
