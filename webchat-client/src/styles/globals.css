@@ -21,7 +21,7 @@ html {
 }
 
 body {
-  background: url('/img/cream_dust.png') repeat 0 0;
+  background: #f0f2f5;
 }
 
 h1 {
@@ -55,8 +55,17 @@ textarea {
   animation-duration: 1s;
 }
 
+.go-retract {    
+  animation-name: retract;
+  animation-duration: 1s;
+}
+
 @keyframes expand {
   from {height:0%;} to {height:100%;}
+}
+
+@keyframes retract {
+  from {height:100%;} to {height:0%;}
 }
 
 .conversation {
@@ -70,12 +79,50 @@ textarea {
   background-color: gainsboro;
 }
 
+.dropdown-menu {
+  left: auto;
+  right: 0;
+  background-clip: padding-box;
+    background-color: var(--color-canvas-overlay);
+    border: var(--primer-borderWidth-thin, 1px) solid var(--color-border-default);
+    border-radius: var(--primer-borderRadius-medium, 6px);
+    box-shadow: var(--color-shadow-large);
+    left: 0;
+    list-style: none;
+    margin-top: 2px;
+    padding-bottom: var(--primer-control-small-paddingBlock, 4px);
+    padding-top: var(--primer-control-small-paddingBlock, 4px);
+    position: absolute;
+    top: 100%;
+    z-index: 100;
+}
+
 .login-button {
   padding: 1rem;
 }
 
+.messages {
+  background: url('/img/cream_dust.png') repeat 0 0;
+}
+
 .messages::-webkit-scrollbar {
-  display: none;
+  width: 10px;
+}
+
+.messages::-webkit-scrollbar-track {
+  background: #bbb8b7; 
+}
+ 
+.messages::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+.messages::-webkit-scrollbar-thumb:hover {
+  background: #666; 
+}
+
+.clickable {
+  cursor: pointer;
 }
 
 /* Hide scrollbar for IE, Edge and Firefox */
