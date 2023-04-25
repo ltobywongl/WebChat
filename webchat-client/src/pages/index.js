@@ -15,6 +15,8 @@ export default function Home() {
   const [roomList, setRoomList] = useState([]);
   const messagesEndRef = useRef(null);
   const topMessageRef = useRef(null);
+  const dropDownMenuRef = useRef(null);
+  const dropDownMenuRefTwo = useRef(null);
   const allowMove = useRef(false);
   const loadMessageMove = useRef(false);
   const batch = useRef(0);
@@ -184,15 +186,19 @@ export default function Home() {
           <div className={"topnav flex flex-row gap-4 p-2"}>
             <button className='text-slate-50 p-4 text-3xl' onClick={() => barClose()}><b>&times; Close</b></button>
             <h1><b>WebChat</b></h1>
-            <img className='avatar h-12 w-12 flex-none rounded-full bg-gray-50' src={session.user.image} />
+            <div className='avatar' onMouseEnter={() => dropDownMenuRefTwo?.current.classList.remove("hidden")} onMouseLeave={() => dropDownMenuRefTwo?.current?.classList.add("hidden")}>
+              <img className='h-12 w-12 flex-none rounded-full bg-gray-50' src={session.user.image} />
+              <div className='dropdown-menu-padding'></div>
+              <div className='dropdown-menu text-sm border border-solid border-indigo-400 bg-indigo-950 hidden' ref={dropDownMenuRefTwo}>
+                <div className='m-4 w-full text-white'>Signed in as<br />{session?.user?.name}</div>
+                <div className='dropdown-divider'></div>
+                <button className='p-4 w-full text-white bg-indigo-950 hover:bg-blue-400' onClick={() => signOut()}>Sign Out</button>
+              </div>
+            </div>
           </div>
           <div className='overflow-scroll h-full'>
-            <button className='login-button conversation bg-red-50' onClick={() => signOut()}>Sign Out</button>
-            <div className='conversation clickable' onClick={() => { enterRoom(1); barClose() }}>
-              Global Chat
-            </div>
             {
-              roomList && (
+              roomList[0] && (
                 roomList.map((roomData, index) => {
                   return (
                     <div className='conversation clickable' key={"room" + index} onClick={() => { enterRoom(roomData.roomid); barClose() }}>
@@ -208,11 +214,19 @@ export default function Home() {
         <div className={"topnav flex flex-row gap-4 p-2"}>
           <button className='text-slate-50 p-4 text-3xl' onClick={() => barOpen()}><b>☰ Menu</b></button>
           <h1><b>WebChat</b></h1>
-          <img className='avatar h-12 w-12 flex-none rounded-full bg-gray-50' src={session.user.image} />
+          <div className='avatar' onMouseEnter={() => dropDownMenuRef?.current.classList.remove("hidden")} onMouseLeave={() => dropDownMenuRef?.current?.classList.add("hidden")}>
+            <img className='h-12 w-12 flex-none rounded-full bg-gray-50' src={session.user.image} />
+            <div className='dropdown-menu-padding'></div>
+            <div className='dropdown-menu text-sm border border-solid border-indigo-400 bg-indigo-950 hidden' ref={dropDownMenuRef}>
+              <div className='m-4 w-full text-white'>Signed in as<br />{session?.user?.name}</div>
+              <div className='dropdown-divider'></div>
+              <button className='p-4 w-full text-white bg-indigo-950 hover:bg-blue-400' onClick={() => signOut()}>Sign Out</button>
+            </div>
+          </div>
         </div>
 
-        <div className='message-box bg-green-200 m-5 p-5'>
-          <h1>Global chat</h1>
+        <div className='message-box bg-blue-200 m-5 p-5'>
+          <h1>{(roomList[0]) && (roomList.find(element => element.roomid === roomId.current))?.name}</h1>
           <div id="messages" className='messages bg-slate-50 overflow-y-scroll border-y-2' onScroll={e => checkScroll(e.target.scrollTop)}>
             {Messages && (
               <ul>

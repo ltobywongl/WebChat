@@ -18,9 +18,13 @@ export const authOptions = {
     async signIn({ user, account, profile, email, credentials }) {
       //TODO: set account
       try {
-        const result = await excuteQuery({
+        await excuteQuery({
           query: "REPLACE INTO user (id, name, email, image) VALUES (?, ?, ?, ?)",
           values: [user.id, user.name, user.email, user.image]
+        });
+        await excuteQuery({
+          query: "INSERT INTO participant (userid, roomid) VALUES (?, ?)",
+          values: [user.id, 1]
         });
         return true;
       } catch (error) {

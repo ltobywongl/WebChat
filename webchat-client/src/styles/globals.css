@@ -21,13 +21,13 @@ html {
 }
 
 body {
-  background: #f0f2f5;
+  background: #7799ce;
 }
 
 h1 {
   align-self: center;
   font-size: 2rem;
-  background: linear-gradient(to bottom right, rgb(95, 137, 196),rgb(129, 158, 117));
+  background: linear-gradient(to bottom right, rgb(95, 137, 196), rgb(129, 158, 117));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -43,29 +43,41 @@ textarea {
 }
 
 .topnav {
-  background: linear-gradient(to bottom right, rgb(10, 30, 20),rgb(40, 20, 80));
+  background: linear-gradient(to bottom right, rgb(10, 30, 20), rgb(40, 20, 80));
 }
 
 .side-bar {
   height: -webkit-fill-available;
 }
 
-.go-expand {    
+.go-expand {
   animation-name: expand;
   animation-duration: 1s;
 }
 
-.go-retract {    
+.go-retract {
   animation-name: retract;
   animation-duration: 1s;
 }
 
 @keyframes expand {
-  from {height:0%;} to {height:100%;}
+  from {
+    height: 0%;
+  }
+
+  to {
+    height: 100%;
+  }
 }
 
 @keyframes retract {
-  from {height:100%;} to {height:0%;}
+  from {
+    height: 100%;
+  }
+
+  to {
+    height: 0%;
+  }
 }
 
 .conversation {
@@ -81,24 +93,35 @@ textarea {
 
 .dropdown-menu {
   left: auto;
-  right: 0;
+  right: 15px;
+  margin-top: 10px;
+  z-index: 100;
+  position: absolute;
   background-clip: padding-box;
-    background-color: var(--color-canvas-overlay);
-    border: var(--primer-borderWidth-thin, 1px) solid var(--color-border-default);
-    border-radius: var(--primer-borderRadius-medium, 6px);
-    box-shadow: var(--color-shadow-large);
-    left: 0;
-    list-style: none;
-    margin-top: 2px;
-    padding-bottom: var(--primer-control-small-paddingBlock, 4px);
-    padding-top: var(--primer-control-small-paddingBlock, 4px);
-    position: absolute;
-    top: 100%;
-    z-index: 100;
+  border-radius: 0.25rem;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.dropdown-menu-padding {
+  background-color: rgba(0, 0, 0, 0);
+  width: 6rem;
+  height: 12px;
+  left: auto;
+  right: 15px;
+  z-index: 99;
+  position: absolute;
+}
+
+.dropdown-divider {
+  border-top: 1px solid #30363d;
+  display: block;
+  height: 0;
+  margin: 8px 0;
 }
 
 .login-button {
-  padding: 1rem;
+  padding: 1.5rem;
 }
 
 .messages {
@@ -110,15 +133,15 @@ textarea {
 }
 
 .messages::-webkit-scrollbar-track {
-  background: #bbb8b7; 
+  background: #bbb8b7;
 }
- 
+
 .messages::-webkit-scrollbar-thumb {
-  background: #888; 
+  background: #888;
 }
 
 .messages::-webkit-scrollbar-thumb:hover {
-  background: #666; 
+  background: #666;
 }
 
 .clickable {
@@ -128,6 +151,8 @@ textarea {
 /* Hide scrollbar for IE, Edge and Firefox */
 .messages {
   height: 60vh;
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
