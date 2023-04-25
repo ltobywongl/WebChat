@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import { useState, useEffect, useRef } from 'react';
 import io from "socket.io-client";
 import { useSession, signIn, signOut } from "next-auth/react"
+import { typeOf } from 'tls';
 let socket;
 
 const inter = Inter({ subsets: ['latin'] })
@@ -13,8 +14,10 @@ export default function Home() {
   const [newMessage, setNewMessage] = useState("");
   const [newBatchCount, setNewBatchCount] = useState(0);
   const [roomList, setRoomList] = useState([]);
+  const [newRoomName, setNewRoomName] = useState("");
   const messagesEndRef = useRef(null);
   const topMessageRef = useRef(null);
+  const createRoomRef = useRef(null);
   const dropDownMenuRef = useRef(null);
   const dropDownMenuRefTwo = useRef(null);
   const allowMove = useRef(false);
@@ -89,6 +92,19 @@ export default function Home() {
     roomId.current = roomid;
   }
 
+  function createRoom(roomType, roomName) {
+    if (status === "authenticated" && typeof roomName === "string" && roomName.length <= 32) {
+      if (confirm(`Confirm creating room (${roomName})?`)) {
+        fetch(`/api/create-room/${roomType}/${roomName}`).then(res => res.json())
+          .then(data => {
+            console.log(data)
+            setRoomList(roomList => [data, ...roomList])
+          })
+        createRoomRef?.current?.classList.add("hidden")
+      }
+    }
+  }
+
   function sendMessage() {
     if (!connected) {
       return;
@@ -146,6 +162,7 @@ export default function Home() {
     }, 950);
   }
 
+
   if (!session) {
     return (
       <>
@@ -186,7 +203,7 @@ export default function Home() {
           <div className={"topnav flex flex-row gap-4 p-2"}>
             <button className='text-slate-50 p-4 text-3xl' onClick={() => barClose()}><b>&times; Close</b></button>
             <h1><b>WebChat</b></h1>
-            <div className='avatar' onMouseEnter={() => dropDownMenuRefTwo?.current.classList.remove("hidden")} onMouseLeave={() => dropDownMenuRefTwo?.current?.classList.add("hidden")}>
+            <div className='avatar' onMouseEnter={() => dropDownMenuRefTwo?.current?.classList.remove("hidden")} onMouseLeave={() => dropDownMenuRefTwo?.current?.classList.add("hidden")}>
               <img className='h-12 w-12 flex-none rounded-full bg-gray-50' src={session.user.image} />
               <div className='dropdown-menu-padding'></div>
               <div className='dropdown-menu text-sm border border-solid border-indigo-400 bg-indigo-950 hidden' ref={dropDownMenuRefTwo}>
@@ -197,6 +214,36 @@ export default function Home() {
             </div>
           </div>
           <div className='overflow-scroll h-full'>
+            <div className='conversation clickable' onClick={() => createRoomRef?.current?.classList.contains("hidden") ? createRoomRef?.current?.classList.remove("hidden") : createRoomRef?.current?.classList.add("hidden")}>
+              Create Room
+            </div>
+            <div className='conversation hidden' ref={createRoomRef}>
+              <div className='w-full max-w-md'>
+                <div className="md:flex md:items-center mb-4">
+                  <div className="md:w-1/2">
+                    <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
+                      Room Name
+                    </label>
+                  </div>
+                  <div className="md:w-1/2">
+                    <input className="w-full bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                      type="text"
+                      placeholder="My Room"
+                      maxLength={32}
+                      onChange={e => setNewRoomName(e.target.value)}
+                      value={newRoomName} />
+                  </div>
+                </div>
+                <div className="md:flex md:items-center">
+                  <div className="md:w-1/2"></div>
+                  <div className="md:w-1/2">
+                    <button className="w-full shadow bg-purple-500 hover:bg-purple-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded" onClick={() => createRoom("room", newRoomName)}>
+                      Create!
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
             {
               roomList[0] && (
                 roomList.map((roomData, index) => {
@@ -207,7 +254,6 @@ export default function Home() {
                   )
                 })
               )}
-
           </div>
         </div>
 
@@ -226,7 +272,7 @@ export default function Home() {
         </div>
 
         <div className='message-box bg-blue-200 m-5 p-5'>
-          <h1>{(roomList[0]) && (roomList.find(element => element.roomid === roomId.current))?.name}</h1>
+          <h1 className='font-bold'>{(roomList[0]) && (roomList.find(element => element.roomid === roomId.current))?.name}</h1>
           <div id="messages" className='messages bg-slate-50 overflow-y-scroll border-y-2' onScroll={e => checkScroll(e.target.scrollTop)}>
             {Messages && (
               <ul>
