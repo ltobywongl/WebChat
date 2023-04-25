@@ -279,16 +279,20 @@ export default function Home() {
                 {Messages.slice().reverse().map((m, index) => {
                   const key = ("Msg" + index)
                   return (
-                    <li key={key} ref={key === ("Msg" + newBatchCount) ? topMessageRef : null} id={key === ("Msg" + newBatchCount) ? "top" : null} className={m.self ? "mx-1 bg-green-50 flex justify-between gap-x-6 py-5" : "mx-1 flex justify-between gap-x-6 py-5"}>
+                    <li key={key} ref={key === ("Msg" + newBatchCount) ? topMessageRef : null} id={key === ("Msg" + newBatchCount) ? "top" : null} className={m.self ? "mx-1 bg-green-50 flex justify-between gap-x-6 py-4" : "mx-1 flex justify-between gap-x-6 py-4"}>
                       <div className="flex gap-x-4">
-                        <img className="h-12 w-12 text-base sm:text-2xl md:text-xl lg:text-lg flex-none rounded-full bg-gray-50" src={m.image} alt={m.username} />
+                        <img className="h-12 w-12 text-sm sm:text-lg md:text-xl lg:text-2xl flex-none rounded-full bg-gray-50" src={m.image} alt={m.username} />
                         <div className="min-w-0 flex-auto">
-                          <p className="text-base sm:text-2xl md:text-xl lg:text-lg font-semibold leading-6 text-gray-900">{m.username}</p>
-                          <p className="mt-1 whitespace-pre-line text-base sm:text-2xl md:text-xl lg:text-lg leading-5 text-gray-500">{m.message}</p>
+                          <p className="text-sm sm:text-lg md:text-xl lg:text-2xl font-semibold leading-6 text-gray-900">{m.username}</p>
+                          <p className="mt-1 whitespace-pre-line text-sm sm:text-lg md:text-xl lg:text-2xl leading-5 text-gray-500">{m.message}</p>
                         </div>
                       </div>
-                      <div className="hidden sm:flex sm:flex-col sm:items-end">
-                        <p className="mt-1 text-base sm:text-2xl md:text-xl lg:text-lg leading-5 text-gray-500 break-words">{m.time}</p>
+                      <div className="flex flex-col items-end">
+                        <p className="mt-1 text-sm sm:text-lg md:text-xl lg:text-2xl leading-5 text-gray-500 break-words text-right">
+                          {m.time.split(" ")[0].substr(5).replace('-', '/')}
+                          <br className='time-split' />
+                          {" "+m.time.split(" ")[1]}
+                        </p>
                       </div>
                     </li>
                   )

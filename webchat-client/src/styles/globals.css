@@ -92,6 +92,16 @@ textarea {
   background-color: gainsboro;
 }
 
+.time-split {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  .time-split {
+    display: block;
+  }
+}
+
 .dropdown-menu {
   left: auto;
   right: 15px;
@@ -151,7 +161,7 @@ textarea {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .messages {
-  height: 60vh;
+  height: 55vh;
   -ms-overflow-style: none;
   /* IE and Edge */
   scrollbar-width: none;

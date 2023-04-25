@@ -114,7 +114,10 @@ io.on('connection', (socket) => {
         console.log(puser, "disconnected");
         if (puser) {
             var today = new Date();
-            var time = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate() + " " + today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            let HoursZ = today.getHours() >= 10 ? '' : '0';
+            let MinutesZ = today.getMinutes() >= 10 ? '' : '0';
+            let SecondsZ = today.getSeconds() >= 10 ? '' : '0';
+            var time = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate() + " " + HoursZ + today.getHours() + ":" + MinutesZ + today.getMinutes() + ":" + SecondsZ + today.getSeconds();
             io.in(puser.room).emit('message', 'Server', puser.image, `${puser.username} has left the room`, time);
             userDiscon(socket.id);
         }
