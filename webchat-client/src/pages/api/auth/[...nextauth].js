@@ -23,7 +23,7 @@ export const authOptions = {
           values: [user.id, user.name, user.email, user.image]
         });
         await excuteQuery({
-          query: "INSERT INTO participant (userid, roomid) VALUES (?, ?)",
+          query: "REPLACE INTO participant (userid, roomid) VALUES (?, ?)",
           values: [user.id, 1]
         });
         return true;

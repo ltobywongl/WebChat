@@ -135,6 +135,10 @@ textarea {
   padding: 1.5rem;
 }
 
+.message-container {
+  word-break: break-word;
+}
+
 .messages {
   background: url('/img/cream_dust.png') repeat 0 0;
 }

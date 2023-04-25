@@ -22,6 +22,7 @@ export default function Home() {
   const dropDownMenuRefTwo = useRef(null);
   const allowMove = useRef(false);
   const loadMessageMove = useRef(false);
+  const allowClearMessage = useRef(false);
   const batch = useRef(0);
   const oldScroll = useRef(1500);
   const roomId = useRef(1);
@@ -62,11 +63,18 @@ export default function Home() {
 
   useEffect(() => {
     if (allowMove.current) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100)
       allowMove.current = false;
     } else if (loadMessageMove.current) {
-      topMessageRef.current.scrollIntoView({ behavior: "instant" });
+      setTimeout(() => {
+        topMessageRef.current?.scrollIntoView({ behavior: "instant" });
+      })
       loadMessageMove.current = false;
+    }
+    if (allowClearMessage.current) {
+      setNewMessage("");
     }
   }, [Messages])
 
@@ -88,7 +96,7 @@ export default function Home() {
         oldScroll.current = 0;
         allowMove.current = true;
       })
-    socket.emit('enterroom', session.user.id, session.user.name, session.user.image, roomid);
+    socket?.emit('enterroom', session.user.id, session.user.name, session.user.image, roomid);
     roomId.current = roomid;
   }
 
@@ -105,8 +113,8 @@ export default function Home() {
     }
   }
 
-  function sendMessage() {
-    if (!connected) {
+  async function sendMessage() {
+    if (!connected || !socket) {
       return;
     }
     var today = new Date();
@@ -114,10 +122,10 @@ export default function Home() {
     let MinutesZ = today.getMinutes() >= 10 ? '' : '0';
     let SecondsZ = today.getSeconds() >= 10 ? '' : '0';
     var time = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate() + " " + HoursZ + today.getHours() + ":" + MinutesZ + today.getMinutes() + ":" + SecondsZ + today.getSeconds();
+    await socket?.emit('chat', session.user.id, newMessage);
     setMessages(Messages => [{ username: session.user.name, image: session.user.image, message: newMessage, time: time, self: true }, ...Messages]);
-    socket?.emit('chat', session.user.id, newMessage);
-    setNewMessage("");
     allowMove.current = true;
+    allowClearMessage.current = true;
   }
 
   function checkScroll(dist) {
@@ -214,7 +222,7 @@ export default function Home() {
             </div>
           </div>
           <div className='overflow-scroll h-full'>
-            <div className='conversation clickable' onClick={() => createRoomRef?.current?.classList.contains("hidden") ? createRoomRef?.current?.classList.remove("hidden") : createRoomRef?.current?.classList.add("hidden")}>
+            <div className='conversation clickable bg-green-100' onClick={() => createRoomRef?.current?.classList.contains("hidden") ? createRoomRef?.current?.classList.remove("hidden") : createRoomRef?.current?.classList.add("hidden")}>
               Create Room
             </div>
             <div className='conversation hidden' ref={createRoomRef}>
@@ -279,19 +287,21 @@ export default function Home() {
                 {Messages.slice().reverse().map((m, index) => {
                   const key = ("Msg" + index)
                   return (
-                    <li key={key} ref={key === ("Msg" + newBatchCount) ? topMessageRef : null} id={key === ("Msg" + newBatchCount) ? "top" : null} className={m.self ? "mx-1 bg-green-50 flex justify-between gap-x-6 py-4" : "mx-1 flex justify-between gap-x-6 py-4"}>
+                    <li key={key} ref={key === ("Msg" + newBatchCount) ? topMessageRef : null} id={key === ("Msg" + newBatchCount) ? "top" : null}
+                      className={m.self ? "mx-1 bg-green-50 max-w-full flex justify-between gap-x-6 py-4" : "mx-1 max-w-full flex justify-between gap-x-6 py-4"}
+                    >
                       <div className="flex gap-x-4">
                         <img className="h-12 w-12 text-sm sm:text-lg md:text-xl lg:text-2xl flex-none rounded-full bg-gray-50" src={m.image} alt={m.username} />
                         <div className="min-w-0 flex-auto">
                           <p className="text-sm sm:text-lg md:text-xl lg:text-2xl font-semibold leading-6 text-gray-900">{m.username}</p>
-                          <p className="mt-1 whitespace-pre-line text-sm sm:text-lg md:text-xl lg:text-2xl leading-5 text-gray-500">{m.message}</p>
+                          <p className="message-container mt-1 whitespace-pre-line text-sm sm:text-lg md:text-xl lg:text-2xl leading-5 text-gray-500">{m.message}</p>
                         </div>
                       </div>
                       <div className="flex flex-col items-end">
                         <p className="mt-1 text-sm sm:text-lg md:text-xl lg:text-2xl leading-5 text-gray-500 break-words text-right">
                           {m.time.split(" ")[0].substr(5).replace('-', '/')}
                           <br className='time-split' />
-                          {" "+m.time.split(" ")[1]}
+                          {" " + m.time.split(" ")[1]}
                         </p>
                       </div>
                     </li>
@@ -304,7 +314,7 @@ export default function Home() {
           <div className='flex flex-row h-20'>
             <textarea
               className='h-full basis-11/12 block rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-              onChange={e => setNewMessage(e.target.value)}
+              onChange={(e) => setNewMessage(e.target.value)}
               value={newMessage}
             />
             <button className='ml-1 bg-green-100 h-full p-5 rounded-md basis-1/12' onClick={() => sendMessage()}>Send</button>
