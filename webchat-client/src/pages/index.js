@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import io from "socket.io-client";
 import { useSession, signIn, signOut } from "next-auth/react"
 import { typeOf } from 'tls';
+import { fetchData } from 'next-auth/client/_utils';
 let socket;
 
 const inter = Inter({ subsets: ['latin'] })
@@ -14,10 +15,13 @@ export default function Home() {
   const [newMessage, setNewMessage] = useState("");
   const [newBatchCount, setNewBatchCount] = useState(0);
   const [roomList, setRoomList] = useState([]);
+  const [invitations, setInvitations] = useState([]);
+  const [roomMembers, setRoomMembers] = useState([]);
   const [newRoomName, setNewRoomName] = useState("");
   const messagesEndRef = useRef(null);
   const topMessageRef = useRef(null);
   const createRoomRef = useRef(null);
+  const inviteRef = useRef(null);
   const dropDownMenuRef = useRef(null);
   const dropDownMenuRefTwo = useRef(null);
   const allowMove = useRef(false);
@@ -36,6 +40,11 @@ export default function Home() {
           setRoomList(fetchdata);
         })
 
+      fetch(`/api/get-invitations`)
+        .then((res) => res.json())
+        .then((fetchData) => {
+          setInvitations(fetchData);
+        })
       socket = io("https://chat.tobywong.ga:2053", {
         secure: true,
         withCredentials: true,
@@ -96,8 +105,22 @@ export default function Home() {
         oldScroll.current = 0;
         allowMove.current = true;
       })
+    if (roomid !== 1) {
+      fetch(`/api/getroommembers/${roomid}`)
+        .then((res) => res.json())
+        .then((fetchData) => {
+          setRoomMembers(fetchData);
+        })
+    } else {
+      setRoomMembers([]);
+    }
     socket?.emit('enterroom', session.user.id, session.user.name, session.user.image, roomid);
     roomId.current = roomid;
+    if (!document.getElementById("roominfo").classList.contains("hidden")) {
+      document.getElementById("roominfo").classList.add("hidden");
+      document.getElementById("messages").classList.remove("hidden");
+      document.getElementById("newmessagebox").classList.remove("hidden");
+    }
   }
 
   function createRoom(roomType, roomName) {
@@ -152,6 +175,40 @@ export default function Home() {
       }
     }
     oldScroll.current = dist;
+  }
+
+  function chatInfo() {
+    if (document.getElementById("roominfo").classList.contains("hidden")) {
+      document.getElementById("messages").classList.add("hidden");
+      document.getElementById("newmessagebox").classList.add("hidden");
+      document.getElementById("roominfo").classList.remove("hidden");
+    } else {
+      document.getElementById("roominfo").classList.add("hidden");
+      document.getElementById("messages").classList.remove("hidden");
+      document.getElementById("newmessagebox").classList.remove("hidden");
+    }
+  }
+
+  function roomCreateToggle() {
+    if (createRoomRef?.current?.classList.contains("hidden")) {
+      createRoomRef?.current?.classList.remove("hidden");
+      if (!inviteRef?.current?.classList.contains("hidden")) {
+        inviteRef?.current?.classList.add("hidden");
+      }
+    } else {
+      createRoomRef?.current?.classList.add("hidden");
+    }
+  }
+
+  function invitesToggle() {
+    if (inviteRef?.current?.classList.contains("hidden")) {
+      inviteRef?.current?.classList.remove("hidden");
+      if (!createRoomRef?.current?.classList.contains("hidden")) {
+        createRoomRef?.current?.classList.add("hidden");
+      }
+    } else {
+      inviteRef?.current?.classList.add("hidden");
+    }
   }
 
   function barOpen() {
@@ -222,8 +279,13 @@ export default function Home() {
             </div>
           </div>
           <div className='overflow-scroll h-full'>
-            <div className='conversation clickable bg-green-100' onClick={() => createRoomRef?.current?.classList.contains("hidden") ? createRoomRef?.current?.classList.remove("hidden") : createRoomRef?.current?.classList.add("hidden")}>
-              Create Room
+            <div className='room-buttons flex'>
+              <div className='room-button w-full p-4 text-center border-r border-r-slate-600 clickable bg-indigo-100' onClick={() => invitesToggle()}>
+                Invites
+              </div>
+              <div className='room-button w-full p-4 text-center clickable bg-indigo-100' onClick={() => roomCreateToggle()}>
+                Create Room
+              </div>
             </div>
             <div className='conversation hidden' ref={createRoomRef}>
               <div className='w-full max-w-md'>
@@ -250,6 +312,43 @@ export default function Home() {
                     </button>
                   </div>
                 </div>
+              </div>
+            </div>
+            <div className='invite hidden' ref={inviteRef}>
+              <div className='w-full'>
+                {
+                  invitations && (
+                    invitations.map((invite, index) => {
+                      return (
+                        <div key={index} className="md:flex md:items-center p-3 border-b border-solid">
+                          <div className="md:w-1/2">
+                            Room: {invite.name}<br />Invite from {invite.inv_name} ({invite.inv_email})
+                          </div>
+                          <div className="md:w-1/2 flex gap-2">
+                            <button
+                              className='w-full shadow bg-green-500 hover:bg-green-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded'
+                              onClick={() => {
+                                fetch(`api/accept-invite/${invite.inv_id}`)
+                                setInvitations(invitation => invitation.filter(item => item.inv_id !== invite.inv_id))
+                              }}
+                            >
+                              Accept
+                            </button>
+                            <button
+                              className='w-full shadow bg-rose-500 hover:bg-rose-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded'
+                              onClick={() => {
+                                fetch(`api/deny-invite/${invite.inv_id}`)
+                                setInvitations(invitation => invitation.filter(item => item.inv_id !== invite.inv_id))
+                              }}
+                            >
+                              Deny
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })
+                  )
+                }
               </div>
             </div>
             {
@@ -279,8 +378,29 @@ export default function Home() {
           </div>
         </div>
 
-        <div className='message-box bg-blue-200 m-5 p-5'>
-          <h1 className='font-bold'>{(roomList[0]) && (roomList.find(element => element.roomid === roomId.current))?.name}</h1>
+        <div className='message-box bg-blue-200 m-5 p-3'>
+          <h1 className='font-bold mb-1'><button className='mr-3 p-1 border-2 border-solid border-blue-300' onClick={() => chatInfo()}>☰</button>{(roomList[0]) && (roomList.find(element => element.roomid === roomId.current))?.name}</h1>
+          <div id="roominfo" className='messages p-1 bg-slate-50 overflow-y-scroll hidden'>
+            {
+              roomId.current === 1 ? null : <button className='py-1 px-2 font-bold rounded focus:shadow-outline focus:outline-none text-lg bg-green-200 sm:text-xl md:text-2xl lg:text-3xl'>+ Invite new member</button>
+            }
+            <div className='font-bold text-sm sm:text-lg md:text-xl lg:text-2xl'>Room members:</div>
+            {
+              roomMembers && (
+                roomMembers.map((user, index) => {
+                  return (
+                    <p key={index} className='flex my-1 text-sm sm:text-lg md:text-xl lg:text-2xl leading-6 text-gray-900'>
+                      <img className="h-8 w-8 mr-2 text-sm sm:text-lg md:text-xl lg:text-2xl flex-none rounded-full bg-gray-50" src={user.image} alt={user.username} />
+                      {user.name}
+                    </p>
+                  )
+                })
+              )
+            }
+            {
+              roomId.current === 1 ? <p>Not available in Global Chat</p> : null
+            }
+          </div>
           <div id="messages" className='messages bg-slate-50 overflow-y-scroll border-y-2' onScroll={e => checkScroll(e.target.scrollTop)}>
             {Messages && (
               <ul>
@@ -311,7 +431,7 @@ export default function Home() {
             )}
             <div ref={messagesEndRef} />
           </div>
-          <div className='flex flex-row h-20'>
+          <div id='newmessagebox' className='flex flex-row h-20'>
             <textarea
               className='h-full basis-11/12 block rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
               onChange={(e) => setNewMessage(e.target.value)}

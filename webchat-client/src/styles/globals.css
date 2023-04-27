@@ -81,6 +81,21 @@ textarea {
   }
 }
 
+.room-buttons {
+  width: 100%;
+  font-size: 1.5rem;
+  border-bottom: 0.1rem inset gainsboro;
+}
+
+.room-button:hover {
+  background-color: rgb(194, 201, 225);
+}
+
+.invite {
+  text-align: -webkit-center;
+  border-bottom: 0.1rem inset gainsboro;
+}
+
 .conversation {
   width: 100%;
   font-size: 1.5rem;
