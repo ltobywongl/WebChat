@@ -85,7 +85,7 @@ export default function Home() {
     fetch(`/api/getmessages/${roomid}/0`)
       .then((res) => res.json())
       .then((fetchdata) => {
-        fetchdata.forEach(element => {
+        fetchdata?.forEach(element => {
           element.time = new Date(element.time);
           let HoursZ = element.time.getHours() >= 10 ? '' : '0';
           let MinutesZ = element.time.getMinutes() >= 10 ? '' : '0';

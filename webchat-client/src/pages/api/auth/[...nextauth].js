@@ -23,8 +23,8 @@ export const authOptions = {
           values: [user.id, user.name, user.email, user.image]
         });
         await excuteQuery({
-          query: "REPLACE INTO participant (userid, roomid) VALUES (?, ?)",
-          values: [user.id, 1]
+          query: "INSERT INTO participant (userid, roomid) VALUES (?, 1) WHERE NOT EXISTS( SELECT * FROM participant WHERE userid = (?) AND roomid = 1;",
+          values: [user.id, user.id]
         });
         return true;
       } catch (error) {
