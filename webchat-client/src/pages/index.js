@@ -18,6 +18,7 @@ export default function Home() {
   const [invitations, setInvitations] = useState([]);
   const [roomMembers, setRoomMembers] = useState([]);
   const [newRoomName, setNewRoomName] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
   const messagesEndRef = useRef(null);
   const topMessageRef = useRef(null);
   const createRoomRef = useRef(null);
@@ -42,8 +43,8 @@ export default function Home() {
 
       fetch(`/api/get-invitations`)
         .then((res) => res.json())
-        .then((fetchData) => {
-          setInvitations(fetchData);
+        .then((fetchdata) => {
+          setInvitations(fetchdata);
         })
       socket = io("https://chat.tobywong.ga:2053", {
         secure: true,
@@ -108,8 +109,8 @@ export default function Home() {
     if (roomid !== 1) {
       fetch(`/api/getroommembers/${roomid}`)
         .then((res) => res.json())
-        .then((fetchData) => {
-          setRoomMembers(fetchData);
+        .then((fetchdata) => {
+          setRoomMembers(fetchdata);
         })
     } else {
       setRoomMembers([]);
@@ -189,6 +190,18 @@ export default function Home() {
     }
   }
 
+  function inviteToRoom(email) {
+    var filter = /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9]+[a-zA-Z0-9.-]+[a-zA-Z0-9]+\.[a-z]{1,4}$/;
+    if (filter.test(email)) {
+      fetch(`/api/invite-to-room/${roomId.current}/${email}`)
+        .then(res => res.json())
+        .then(fetchdata => alert(fetchdata))
+      setInviteEmail("");
+    } else {
+      alert("Email in wrong format!")
+    }
+  }
+
   function roomCreateToggle() {
     if (createRoomRef?.current?.classList.contains("hidden")) {
       createRoomRef?.current?.classList.remove("hidden");
@@ -215,15 +228,19 @@ export default function Home() {
     document.getElementById("sideBar").style.display = "block";
     document.getElementById("sideBar").classList.add("go-expand");
     setTimeout(function () {
-      document.getElementById("sideBar").classList.remove("go-expand");
+      if (document.getElementById("sideBar")) {
+        document.getElementById("sideBar").classList.remove("go-expand");
+      }
     }, 1000);
   }
 
   function barClose() {
     document.getElementById("sideBar").classList.add("go-retract");
     setTimeout(function () {
-      document.getElementById("sideBar").classList.remove("go-retract");
-      document.getElementById("sideBar").style.display = "none";
+      if (document.getElementById("sideBar")) {
+        document.getElementById("sideBar").classList.remove("go-retract");
+        document.getElementById("sideBar").style.display = "none";
+      }
     }, 950);
   }
 
@@ -237,21 +254,21 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <div className="side-bar bg-slate-50 fixed top-0 left-0 right-0 hidden" id="sideBar">
+        <div className="font-mono side-bar bg-slate-50 fixed top-0 left-0 right-0 hidden" id="sideBar">
           <div className={"topnav flex flex-row gap-4 p-2"}>
-            <button className='text-slate-50 p-4 text-3xl' onClick={() => barClose()}><b>&times; Close</b></button>
-            <h1><b>WebChat</b></h1>
+            <button className='text-slate-50 font-sans p-4 text-3xl' onClick={() => barClose()}><b>&times; Close</b></button>
+            <h1 className='font-sans'><b>WebChat</b></h1>
           </div>
           <button className='login-button conversation bg-green-50' onClick={() => signIn('google')}>Sign In to use the app</button>
         </div>
 
-        <div className={"topnav flex flex-row gap-4 p-2"}>
-          <button className='text-slate-50 p-4 text-3xl' onClick={() => barOpen()}><b>☰ Menu</b></button>
-          <h1><b>WebChat</b></h1>
+        <div className="font-mono topnav flex flex-row gap-4 p-2">
+          <button className='text-slate-50 font-sans p-4 text-3xl' onClick={() => barOpen()}><b>☰ Menu</b></button>
+          <h1 className='font-sans'><b>WebChat</b></h1>
         </div>
 
         <div>
-          <button className='login-button conversation bg-green-50' onClick={() => signIn('google')}>Sign In to use the app</button>
+          <button className='login-button font-mono conversation bg-green-50' onClick={() => signIn('google')}>Sign In to use the app</button>
         </div>
       </>
     )
@@ -264,10 +281,10 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <div className="side-bar bg-slate-50 fixed top-0 left-0 right-0 hidden" id="sideBar">
+        <div className="side-bar font-mono bg-slate-50 fixed top-0 left-0 right-0 hidden" id="sideBar">
           <div className={"topnav flex flex-row gap-4 p-2"}>
-            <button className='text-slate-50 p-4 text-3xl' onClick={() => barClose()}><b>&times; Close</b></button>
-            <h1><b>WebChat</b></h1>
+            <button className='text-slate-50 font-sans p-4 text-3xl' onClick={() => barClose()}><b>&times; Close</b></button>
+            <h1 className='font-sans'><b>WebChat</b></h1>
             <div className='avatar' onMouseEnter={() => dropDownMenuRefTwo?.current?.classList.remove("hidden")} onMouseLeave={() => dropDownMenuRefTwo?.current?.classList.add("hidden")}>
               <img className='h-12 w-12 flex-none rounded-full bg-gray-50' src={session.user.image} />
               <div className='dropdown-menu-padding'></div>
@@ -279,8 +296,8 @@ export default function Home() {
             </div>
           </div>
           <div className='overflow-scroll h-full'>
-            <div className='room-buttons flex'>
-              <div className='room-button w-full p-4 text-center border-r border-r-slate-600 clickable bg-indigo-100' onClick={() => invitesToggle()}>
+            <div className='room-buttons border-b border-b-slate-500 flex'>
+              <div className='room-button w-full p-4 text-center border-r border-r-slate-500 clickable bg-indigo-100' onClick={() => invitesToggle()}>
                 Invites
               </div>
               <div className='room-button w-full p-4 text-center clickable bg-indigo-100' onClick={() => roomCreateToggle()}>
@@ -364,9 +381,9 @@ export default function Home() {
           </div>
         </div>
 
-        <div className={"topnav flex flex-row gap-4 p-2"}>
-          <button className='text-slate-50 p-4 text-3xl' onClick={() => barOpen()}><b>☰ Menu</b></button>
-          <h1><b>WebChat</b></h1>
+        <div className={"topnav font-mono flex flex-row gap-4 p-2"}>
+          <button className='text-slate-50 font-sans p-4 text-3xl' onClick={() => barOpen()}><b>☰ Menu</b></button>
+          <h1 className='font-sans'><b>WebChat</b></h1>
           <div className='avatar' onMouseEnter={() => dropDownMenuRef?.current.classList.remove("hidden")} onMouseLeave={() => dropDownMenuRef?.current?.classList.add("hidden")}>
             <img className='h-12 w-12 flex-none rounded-full bg-gray-50' src={session.user.image} />
             <div className='dropdown-menu-padding'></div>
@@ -378,11 +395,23 @@ export default function Home() {
           </div>
         </div>
 
-        <div className='message-box bg-blue-200 m-5 p-3'>
-          <h1 className='font-bold mb-1'><button className='mr-3 p-1 border-2 border-solid border-blue-300' onClick={() => chatInfo()}>☰</button>{(roomList[0]) && (roomList.find(element => element.roomid === roomId.current))?.name}</h1>
+        <div className='message-box font-mono bg-blue-200 m-5 p-3'>
+          <h1 className='font-bold font-sans mb-1'><button className='mr-3 p-1 border-2 border-solid border-blue-300' onClick={() => chatInfo()}>☰</button>{(roomList[0]) && (roomList.find(element => element.roomid === roomId.current))?.name}</h1>
           <div id="roominfo" className='messages p-1 bg-slate-50 overflow-y-scroll hidden'>
             {
-              roomId.current === 1 ? null : <button className='py-1 px-2 font-bold rounded focus:shadow-outline focus:outline-none text-lg bg-green-200 sm:text-xl md:text-2xl lg:text-3xl'>+ Invite new member</button>
+              roomId.current === 1 ? null :
+                <>
+                  <div className='font-bold text-sm sm:text-lg md:text-xl lg:text-2xl'>Invite new member:</div>
+                  <div className='flex gap-1'>
+                    <input className="w-full bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                      type="email"
+                      placeholder="user@example.com"
+                      maxLength={254}
+                      onChange={e => setInviteEmail(e.target.value)}
+                      value={inviteEmail} />
+                    <button type='submit' className='py-2 px-4 font-bold rounded focus:shadow-outline focus:outline-none text-lg bg-green-200 sm:text-xl md:text-2xl lg:text-3xl' onClick={() => inviteToRoom(inviteEmail)}>+Invite</button>
+                  </div>
+                </>
             }
             <div className='font-bold text-sm sm:text-lg md:text-xl lg:text-2xl'>Room members:</div>
             {

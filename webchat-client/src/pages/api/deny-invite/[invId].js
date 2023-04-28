@@ -17,7 +17,7 @@ export default async function handler(req, res) {
             if (result && JSON.parse(JSON.stringify(result[0]))['nums'] === 1) Access = true;
         } catch (error) {
             console.log(error);
-            res.status(500).json([{}])
+            res.status(500).json("Error")
         }
     }
 
@@ -27,12 +27,12 @@ export default async function handler(req, res) {
                 query: 'DELETE FROM invitation WHERE id = (?);',
                 values: [invId]
             });
-            res.status(200).json([])
+            res.status(200).json("Success")
         } catch (error) {
             console.log(error);
-            res.status(500).json([])
+            res.status(500).json("Error")
         }
     } else {
-        res.status(500).json([])
+        res.status(500).json("No invitation!")
     }
 }
