@@ -43,16 +43,14 @@ export default async function handler(req, res) {
 
     if (!alrInRoom) {
         try {
-            if (result) {
-                await excuteQuery({
-                    query: 'DELETE FROM invitation WHERE id = (?);',
-                    values: [invId]
-                });
-                await excuteQuery({
-                    query: 'INSERT INTO participant (userid, roomid) VALUES ((?), (?));',
-                    values: [session.user.id, roomId]
-                });
-            }
+            await excuteQuery({
+                query: 'DELETE FROM invitation WHERE id = (?);',
+                values: [invId]
+            });
+            await excuteQuery({
+                query: 'INSERT INTO participant (userid, roomid) VALUES ((?), (?));',
+                values: [session.user.id, roomId]
+            });
             res.status(200).json("Success")
         } catch (error) {
             console.log(error);

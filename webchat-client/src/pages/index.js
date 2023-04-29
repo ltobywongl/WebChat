@@ -346,6 +346,7 @@ export default function Home() {
                               className='w-full shadow bg-green-500 hover:bg-green-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded'
                               onClick={() => {
                                 fetch(`api/accept-invite/${invite.inv_id}`)
+                                setRoomList(list => [...list, {roomid: invite.roomid, name: invite.name}])
                                 setInvitations(invitation => invitation.filter(item => item.inv_id !== invite.inv_id))
                               }}
                             >
